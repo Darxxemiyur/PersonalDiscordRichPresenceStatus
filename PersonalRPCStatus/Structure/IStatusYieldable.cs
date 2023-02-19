@@ -1,15 +1,18 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-
-namespace Name.Bayfaderix.Darxxemiyur.PersonalRPCStatus.Structure
+﻿namespace Name.Bayfaderix.Darxxemiyur.PersonalRPCStatus.Structure
 {
 	/// <summary>
-	/// 
+	/// Describes an interface of getting the StatusRecord objects. Similar to IEnumerable.
 	/// </summary>
 	public interface IStatusYieldable
 	{
+		Task<bool> IsCompleted();
+
+		Task<bool> IsCurrentEmpty();
+
+		Task<bool> Next();
+
+		Task<StatusRecord> GetRecord();
+
+		Task<IAsyncEnumerable<StatusRecord>> UnrollRecords();
 	}
 }
