@@ -5,14 +5,16 @@
 	/// </summary>
 	public interface IStatusYieldable
 	{
-		Task<bool> IsCompleted();
+		//Task<bool> IsCompleted();
 
-		Task<bool> IsCurrentEmpty();
+		//Task<bool> IsCurrentEmpty();
 
-		Task<bool> Next();
+		//Task<bool> Next();
 
-		Task<StatusRecord> GetRecord();
+		//Task<StatusRecord> GetRecord();
 
-		Task<IAsyncEnumerable<StatusRecord>> UnrollRecords();
+		//IAsyncEnumerable<IStatusYieldable> GetChildren();
+
+		IAsyncEnumerable<StatusRecord> UnrollRecords();
 	}
 }

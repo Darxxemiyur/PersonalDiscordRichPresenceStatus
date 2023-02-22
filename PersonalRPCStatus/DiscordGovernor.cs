@@ -15,15 +15,17 @@ namespace Name.Bayfaderix.Darxxemiyur.PersonalRPCStatus
 		private readonly CancellationTokenSource _source;
 		private Task _waiterTask;
 		private readonly AsyncLocker _lock;
+		private readonly ulong _defaultId;
 
-		internal DiscordGovernor()
+		internal DiscordGovernor(ulong defaultId)
 		{
+			_defaultId = defaultId;
 			_lock = new();
 			_source = new();
 			_waiterTask = Task.CompletedTask;
 		}
 
-		private async Task PShutdown()
+		private async Task PrivateShutdown()
 		{
 			if (_link == null)
 				return;
@@ -35,19 +37,21 @@ namespace Name.Bayfaderix.Darxxemiyur.PersonalRPCStatus
 
 		private async Task UpdateIfNeeded(string? id)
 		{
+			if (_link == null && id == null)
+				id = $"{_defaultId}";
+
 			if (_link?.ApplicationID == id || id == null)
 				return;
 
-			await PShutdown();
+			await PrivateShutdown();
 
 			_link = new(id);
-
 			using var relay = new MyTaskSource();
 			_link.OnReady += (x, y) => relay.TrySetResult();
 
 			if (!await MyTaskExtensions.RunOnScheduler(_link.Initialize))
 			{
-				await PShutdown();
+				await PrivateShutdown();
 				throw new InvalidOperationException($"{nameof(_link)} wasn't able to initialize!");
 			}
 
@@ -85,23 +89,27 @@ namespace Name.Bayfaderix.Darxxemiyur.PersonalRPCStatus
 			rp.WithAssets(asset);
 
 			var thingy = MyTaskExtensions.RunOnScheduler(() => _link.SetPresence(rp), _source.Token);
-			_waiterTask = Task.WhenAll(thingy, Task.Delay(3000, _source.Token), Task.Delay(record.Duration, _source.Token));
+			_waiterTask = Task.WhenAll(thingy, Task.Delay(2500, _source.Token), Task.Delay(record.Duration, _source.Token));
 			await thingy;
 		}
 
 		public async Task PassNext(StatusRecord record)
 		{
-			await using var _ = await _lock.BlockAsyncLock();
+			await using (var _ = await _lock.BlockAsyncLock())
+			{
+
+				await _waiterTask;
+				await UpdateIfNeeded(record.ApplicationID);
+				await SetStatus(record);
+			}
 			await _waiterTask;
-			await UpdateIfNeeded(record.ApplicationID);
-			await SetStatus(record);
 		}
 
 		public async Task Shutdown()
 		{
 			await using var _ = await _lock.BlockAsyncLock();
 			await MyTaskExtensions.RunOnScheduler(_source.Cancel);
-			await PShutdown();
+			await PrivateShutdown();
 		}
 	}
 }

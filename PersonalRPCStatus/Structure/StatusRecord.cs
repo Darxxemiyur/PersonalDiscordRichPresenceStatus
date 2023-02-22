@@ -16,11 +16,9 @@ namespace Name.Bayfaderix.Darxxemiyur.PersonalRPCStatus.Structure
 		[NotNull] public readonly TimeSpan Duration;
 		public bool HasAnything => (TopText != null || BottomText != null || SmallIcon != null || LargeIcon != null) && Duration.TotalSeconds > 0;
 
-		public StatusRecord(string? topText = null, string? bottomText = null, Icon? smallIcon = null, Icon? largeIcon = null, TimeSpan? duration = default, ulong? applicationID = null) : this(topText, bottomText, smallIcon, largeIcon, duration, applicationID?.ToString())
-		{
-		}
+		//public StatusRecord(string? topText = null, string? bottomText = null, Icon? smallIcon = null, Icon? largeIcon = null, TimeSpan? duration = default, ulong? applicationID = null) : this(topText, bottomText, smallIcon, largeIcon, duration, applicationID?.ToString()) { }
 
-		public StatusRecord(string? topText = null, string? bottomText = null, Icon? smallIcon = null, Icon? largeIcon = null, TimeSpan? duration = default, string? applicationID = null)
+		public StatusRecord(TimeSpan? duration = default, string? topText = null, string? bottomText = null, Icon? smallIcon = null, Icon? largeIcon = null, string? applicationID = null)
 		{
 			TopText = AcceptOrThrow(topText);
 			BottomText = AcceptOrThrow(bottomText);

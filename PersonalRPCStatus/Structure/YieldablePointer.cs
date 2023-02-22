@@ -1,7 +1,11 @@
 ﻿namespace Name.Bayfaderix.Darxxemiyur.PersonalRPCStatus.Structure
 {
-	internal class YieldablePointer
+	internal class YieldablePointer : IStatusYieldable
 	{
-		private IStatusYieldable _target;
+		private readonly IStatusYieldable _target;
+
+		public YieldablePointer(IStatusYieldable target) => _target = target;
+
+		public IAsyncEnumerable<StatusRecord> UnrollRecords() => _target.UnrollRecords();
 	}
 }
